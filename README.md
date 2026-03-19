@@ -45,7 +45,21 @@ It also includes the subset of the cetacean call dataset that is being used in t
 
 Figure 1 shows a spectrogram of one of the southern resident killer whale call audio recordings in its unaltered format.
 
+<p align="center">
+  <img src="images/srkw_raw.png" width="500">
+</p>
+<p align="center">
+  <em>Figure 1: Spectrogram of an unaltered Southern Resident Killer Whale vocalization</em>
+</p>
+
 Figure 2 shows a spectrogram of the same call after it is de-noised using spectral gating with a threshold of 1.5.
+
+<p align="center">
+  <img src="images/srkw_denoise.png" width="500">
+</p>
+<p align="center">
+  <em>Figure 2: Spectrogram of a Southern Resident Killer Whale vocalization de-noised using spectral gating</em>
+</p>
 
 In the current iteration of the project, spectral gating is not effective at isolating and clarifying the killer whale calls. This is because most of the calls do not have an amplitude that is significantly higher than the baseline noise of the audio recording, so filtering primarily using amplitude is not effective.
 
