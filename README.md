@@ -7,6 +7,7 @@ In the Salish Sea, a biologically rich environment, many species of cetaceans (w
 
 One suggestion for improving approach distance compliance that has gained popularity in recent years is use hydrophones, underwater microphones, to detect and locate nearby cetaceans. Because of the distinctness of their vocalizations, trained individuals can identify cetacean calls, down to the individual pod of orcas, with a high degree of accuracy, which when detected using a hyrdophone array, as seen in Figure 1, can be used to pinpoint the origin of specific calls. Unfortunately, because of the size of the range, and the large number of hydrophones that need to be constantly listening in order to achieve accurate detection, using human annotators for real time detection is infeasible. A solution to this problem that has been proposed and experimented with in recent years is to use machine learning to identify and locate the origin of cetacean calls.
 
+<img src="images/Deployment of icListen's new hydrophone array.png"></p>
 Figure 1: Hydrophone array deployed by Ocean Networks Canada
 
 Barriers to Implementation and Adoption
@@ -30,16 +31,19 @@ Project Goals
 This section outlines the specific goals of the project at different levels. These goals were defined before any significant work on the project began.
 
 Basic
-Find a suitable cetacean call dataset that can be used for machine learning.
-Train a classification model on the calls to classify clips with killer whale calls, humpback whale calls, and no cetacean calls.
-Implement spectral gating to de-noise audio samples.
+-Find a suitable cetacean call dataset that can be used for machine learning.
+-Train a classification model on the calls to classify clips with killer whale calls, humpback whale calls, and no cetacean calls.
+-Implement spectral gating to de-noise audio samples.
+
 Expected
-Implement spectral subtraction to de-noise audio samples.
-Implement a human speech de-noising package on the bio-acoustic audio samples.
-Train the classification model on de-noised versions of the calls to see if classification accuracy improves in comparison to the baseline.
+-Implement spectral subtraction to de-noise audio samples.
+-Implement a human speech de-noising package on the bio-acoustic audio samples.
+-Train the classification model on de-noised versions of the calls to see if classification accuracy improves in comparison to the baseline.
+
 Extended
-Create an algorithm that can identify and mark the beginning and ends of cetacean calls within an audio clip.
-Expand the classifier to include data from other labeled datasets.
+-Create an algorithm that can identify and mark the beginning and ends of cetacean calls within an audio clip.
+-Expand the classifier to include data from other labeled datasets.
+
 Achieved
 
 All the goals in the basic and expected levels were completed in the scope of the project. However, the goals in the extended level were not completed. This is largely due to time constraints. This project involved training multiple Convolutional Neural Networks with a sizable dataset, which I did not have prior experience with, resulting in a significant amount of trail and error. Each time a model was trained it took between 20 minutes to an hour and a half. Three different CNN models were trained, one as the baseline on the raw spectrograms, one on the spectrograms with spectral subtraction, and one on spectrograms with Per-Channel Energy Normalization. This meant there was ultimately not enough time to complete the extended goals.
@@ -48,6 +52,7 @@ De-Noising Algorithms
 
 Background noise is a significant problem in bio-acoustics, particularly in cases where sounds are recorded in non controlled settings. Many of the most popular methods for de-noising sound samples either for human classification or machine learning have been taken from the fields of human speech detection and music information retrieval. Three popular methods were explored in the scope of this project. For demonstration purposes all three algorithms were applied to the same SRKW vocalization sample shown an unaltered spectrogram in Figure 2.
 
+<p align="center"><img src="images/base_srkw.png"></p>
 Figure 2: Spectrogram of an unaltered Southern Resident Killer Whale vocalization
 
 Spectral Gating
@@ -58,6 +63,7 @@ Spectral gating was able to make the calls appear more visually distinct when lo
 
 Ultimately, no model was trained using the samples de-noised using spectral gating. The primary reason for this was an inability to find an suitable threshold value that was effective across a selected subset of audio samples.
 
+<p align="center"><img src="images/gate_srkw.png"></p>
 Figure 3: Spectrogram of a Southern Resident Killer Whale vocalization with spectral gating at a threshold of 1.5 applied
 
 Spectral Subtraction
@@ -66,6 +72,7 @@ The next de-noising algorithm experimented with is known as spectral subtraction
 
 In this case spectral subtraction was effective at removing the consistent background noise while leaving some of the more infrequent noises, both the vocalization and other background noise. This is the expected behaviour for this algorithm. It was able to improve he distinctness of the vocalizations both through audio, for the human ear, and visually via the spectrogram, as can be seen in Figure 4.
 
+<p align="center"><img src="images/sub_srkw.png"></p>
 Figure 4: Spectrogram of a Southern Resident Killer Whale vocalization with spectral subtraction applied to it
 
 Per-Channel Energy Normalization
@@ -76,12 +83,14 @@ PCEN is distinct from the other two de-noising methods explored in this project 
 
 For the vocalizations it was tested on, PCEN was effective at removing the background noise from the samples, however it also had the tendency to over-normalize the actual vocalizations. The vocalizations were mostly left in the resulting spectrogram but often appeared very faint, as can be seen in Figure 5. This may be an issue that can be tuned with better parameter selection but was not figured out in this project.
 
+<p align="center"><img src="images/pcen_srkw.png"></p>
 Figure 5: Spectrogram of a Southern Resident Killer Whale vocalization with Per-Channel Energy Normalization Applied to it
 
 Cetacean Call Data Set
 
 The primary data set used in this project was recorded from a single cabled hydrophone located off the coast of San Juan Island in Washington state. The dataset is comprised of 3 second sound samples that were labelled as being either SRKW, humpback songs, or negative (containing typical, non-vocalization sounds for the area) by trained acousticians accustomed to bio-acoustic datadataset:1. A clear example of each of these classes can be seen in Figure 6. For this project a subset of 2100 total audio samples were used, with an equal distribution between the three classes. Of these selected samples, a total of 100 from each class were set aside to be used for testing.
 
+<p align="center"><img src="images/all3.png"></p>
 Figure 6: Representative spectrograms of the three audio classes examined, in the order Southern Resident Killer Whale, Humpback Whale, and Negative on the bottom.
 
 Machine Learning Exploration
@@ -96,6 +105,7 @@ The first model was trained using the raw data, with preprocessing restricted to
 
 This baseline classifier was able to achieve a validation accuracy of 76.7%. It was able to classify the humpback calls with the most accuracy, correctly classifying 93 out of 100 samples. However the classifier struggled more with the SRKW samples of which only 58 were classified correctly. This is to be expected for a couple of reasons. First of all, there are several different kinds of SRKW vocalizations which are distinct from each other, making their classification more complex. Also some of the SRKW vocalizations, particularly the clicks, are faint in volume and very brief, which makes it more likely to get lost in the aggregation portions of the model or mistaken as noise.
 
+<p align="center"><img src="images/raw_cnn_classification_mat.png"></p>
 Figure 7: Confusion matrix for the model trained using the unaltered spectrograms
 
 Spectral Subtraction Model
@@ -108,6 +118,7 @@ This was achieved with a relatively naive application of spectral subtraction wh
 
 A potentially more effective application of this de-noising algorithm could be one where the start and end times for each vocalization were estimated so that the noise estimate used in the subtraction could be chosen from a portion of the audio that is just noise.
 
+<p align="center"><img src="images/sub_cnn_classification_mat.png"></p>
 Figure 8: Confusion matrix for the model trained using the spectrograms with spectral subtraction applied to them
 
 PCEN Model
@@ -116,6 +127,7 @@ The final model was trained using data that had the PCEN algorithm applied to th
 
 One possible explanation for why the model was less effective is that some of the PCEN de-noised samples had the vocalizations normalized out. When manually inspecting the samples it was noticed that some of the humpback sounds had the vocalizations removed with the noise, as they overlapped in frequency. It was also noticed that some of the SRKW clicking vocalizations, which appear very small on the unaltered spectrogram were missed in the normalization process.
 
+<p align="center"><img src="images/pcen_cnn_classification_mat.png"></p>
 Figure 9: Confusion matrix for the model trained using the spectrograms with Per-Channel Energy Normalization Applied to them
 
 Project Deliverables
